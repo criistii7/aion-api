@@ -69,8 +69,8 @@ app.get('/notify/test', async (req, res) => {
   const { phone, apikey, name } = req.query;
   if (!phone || !apikey || !name) return res.status(400).json({ error: 'Faltan phone, apikey o name' });
   try {
-    await sendTest(phone, apikey, name);
-    res.json({ ok: true, message: `Mensaje enviado a ${phone}` });
+    const callmebotResponse = await sendTest(phone, apikey, name);
+    res.json({ ok: true, message: `Mensaje enviado a ${phone}`, callmebot: callmebotResponse });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }

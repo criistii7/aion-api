@@ -20,12 +20,15 @@ async function sbGet(table, qs = '') {
 }
 
 async function sendWA(phone, apikey, message) {
-  const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}&apikey=${apikey}`;
+  const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(message)}&apikey=${apikey}`;
   try {
-    await fetch(url);
-    console.log(`[WA] Enviado a ${phone}`);
+    const r = await fetch(url);
+    const body = await r.text();
+    console.log(`[WA] Respuesta CallMeBot (${phone}):`, body);
+    return body;
   } catch(e) {
     console.error(`[WA] Error enviando a ${phone}:`, e.message);
+    return e.message;
   }
 }
 
@@ -115,8 +118,8 @@ async function hoursCheck() {
 
 // ── Endpoint de prueba manual ──────────────────────────────────────
 async function sendTest(phone, apikey, name) {
-  await sendWA(phone, apikey,
-    `✅ Hola ${name}, este es un mensaje de prueba del sistema de notificaciones de Sección 9. ¡Funciona correctamente!`
+  return await sendWA(phone, apikey,
+    `✅ Hola ${name}, este es un mensaje de prueba del sistema de notificaciones de Sección 9. Funciona correctamente.`
   );
 }
 
