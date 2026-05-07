@@ -62,7 +62,7 @@ async function morningCheck() {
       await sendWA(
         phoneMap[name].phone,
         phoneMap[name].apikey,
-        `⏰ Hola ${name.split(' ')[0]}, son las 9:15 y aún no has fichado entrada en Sección 9. Recuerda registrarla cuando empieces.`
+        `⏰ Hola ${name.split(' ')[0]}, recuerda fichar entrada en Sección 9 si aún no lo has hecho. ¡Buen día!`
       );
     }
   } catch(e) {
@@ -97,17 +97,14 @@ async function hoursCheck() {
 
       const workedMs = now - row.entrada - pauseMs;
 
-      if (workedMs >= 8.5 * 3600 * 1000) {
+      if (workedMs >= (8 * 3600000 + 20 * 60000)) {
         if (await isAbsent(row.persona)) continue;
         notifiedToday.add(key);
-
-        const h = Math.floor(workedMs / 3600000);
-        const m = Math.floor((workedMs % 3600000) / 60000);
 
         await sendWA(
           phoneMap[row.persona].phone,
           phoneMap[row.persona].apikey,
-          `⚠️ Hola ${row.persona.split(' ')[0]}, llevas ${h}h ${m}min trabajadas. Recuerda registrar tu salida en Sección 9 cuando termines.`
+          `⚠️ Hola ${row.persona.split(' ')[0]}, recuerda registrar tu salida en Sección 9 si aún no lo has hecho. ¡Que descanses!`
         );
       }
     }
@@ -125,7 +122,7 @@ async function sendTest(phone, apikey, name) {
 
 function initCrons() {
   // 9:15 AM lunes a viernes, hora Madrid
-  cron.schedule('15 9 * * 1-5', morningCheck, { timezone: 'Europe/Madrid' });
+  cron.schedule('05 9 * * 1-5', morningCheck, { timezone: 'Europe/Madrid' });
 
   // Cada 5 minutos
   cron.schedule('*/5 * * * *', hoursCheck);
