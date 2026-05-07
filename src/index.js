@@ -4,6 +4,7 @@ const db = require('./db');
 const roomRoutes = require('./routes/rooms');
 const bookingRoutes = require('./routes/bookings');
 const aiRoutes = require('./routes/ai');
+const { initCrons, sendTest } = require('./services/notifications');
 
 const app = express();
 app.use(cors());
@@ -63,8 +64,23 @@ app.get('/', (req, res) => {
   res.json({ message: 'AION API funcionando', version: '1.0.0' });
 });
 
+// Prueba manual de WhatsApp: GET /notify/test?phone=+34XXX&apikey=XXXX&name=Nombre
+app.get('/notify/test', async (req, res) => {
+  const { phone, apikey, name } = req.query;
+  if (!phone || !apikey || !name) return res.status(400).json({ error: 'Faltan phone, apikey o name' });
+  try {
+    await sendTest(phone, apikey, name);
+    res.json({ ok: true, message: `Mensaje enviado a ${phone}` });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 
 initDB()
-  .then(() => app.listen(PORT, () => console.log(`AION API corriendo en puerto ${PORT}`)))
+  .then(() => {
+    app.listen(PORT, () => console.log(`AION API corriendo en puerto ${PORT}`));
+    initCrons();
+  })
   .catch(err => { console.error('Error DB:', err); process.exit(1); });
