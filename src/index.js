@@ -3,6 +3,7 @@ const cors = require('cors');
 const db = require('./db');
 const roomRoutes = require('./routes/rooms');
 const bookingRoutes = require('./routes/bookings');
+const aiRoutes = require('./routes/ai');
 
 const app = express();
 app.use(cors());
@@ -56,6 +57,7 @@ async function initDB() {
 
 app.use('/rooms', roomRoutes);
 app.use('/bookings', bookingRoutes);
+app.use('/ai', aiRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'AION API funcionando', version: '1.0.0' });
