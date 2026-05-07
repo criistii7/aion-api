@@ -36,23 +36,28 @@ ${JSON.stringify(bookings.rows, null, 2)}
 Estadísticas globales:
 ${JSON.stringify(stats.rows[0], null, 2)}`;
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: context + '\n\nPREGUNTA DEL USUARIO: ' + question }] }]
-        })
-      }
-    );
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama3-8b-8192',
+        messages: [
+          { role: 'system', content: context },
+          { role: 'user', content: question }
+        ],
+        max_tokens: 600
+      })
+    });
 
-    const geminiData = await geminiRes.json();
-    const answer = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const groqData = await groqRes.json();
+    const answer = groqData?.choices?.[0]?.message?.content;
 
     if (!answer) {
-      console.error('Gemini error:', JSON.stringify(geminiData));
-      return res.status(500).json({ error: 'Gemini: ' + JSON.stringify(geminiData) });
+      console.error('Groq error:', JSON.stringify(groqData));
+      return res.status(500).json({ error: 'Groq: ' + JSON.stringify(groqData) });
     }
 
     res.json({ answer });
