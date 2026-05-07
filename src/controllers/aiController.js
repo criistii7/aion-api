@@ -53,7 +53,7 @@ ${JSON.stringify(stats.rows[0], null, 2)}`;
 
     if (!answer) {
       console.error('Gemini error:', JSON.stringify(geminiData));
-      return res.status(500).json({ error: 'Sin respuesta de la IA' });
+      return res.status(500).json({ error: 'Gemini: ' + JSON.stringify(geminiData) });
     }
 
     res.json({ answer });
